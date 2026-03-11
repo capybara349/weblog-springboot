@@ -6,29 +6,32 @@
     <!-- 将 Spring Boot 的版本号2.6.3 -->
     <parent>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter</artifactId>
+        <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.6.3</version>
         <relativePath/>
     </parent>
 
     <groupId>com.capybara349</groupId>
     <artifactId>weblog-springboot</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${revision}</version>
     <name>weblog-springboot</name>
     <description>前后端分离博客 Weblog By Capybara349</description>
 
     <!-- 指定打包方式为 pom -->
     <packaging>pom</packaging>
-
-    <!-- 模块管理 -->
+    <!-- 子模块管理 -->
     <modules>
-
+        <!-- 入口模块 -->
+        <module>weblog-web</module>
+        <!-- 管理后台 -->
+        <module>weblog-module-admin</module>
+        <!-- 通用模块 -->
+        <module>weblog-module-common</module>
     </modules>
-
-
     <!-- 统一管理版本号 -->
     <properties>
         <!-- 项目版本号 -->
+        <revision>0.0.1-SANPSHOT</revision>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -36,17 +39,59 @@
         <!-- Maven 相关 -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <lombok.version>1.18.28</lombok.version>
+        <guava.version>33.3.1-jre</guava.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
     </properties>
 
     <!-- 统一依赖管理 -->
     <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.quanxiaoha</groupId>
+                <artifactId>weblog-module-admin</artifactId>
+                <version>${revision}</version>
+            </dependency>
 
+            <dependency>
+                <groupId>com.quanxiaoha</groupId>
+                <artifactId>weblog-module-common</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- 常用工具库 -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
 
     <build>
         <!-- 统一插件管理 -->
         <pluginManagement>
-
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <exclude>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
         </pluginManagement>
     </build>
 
