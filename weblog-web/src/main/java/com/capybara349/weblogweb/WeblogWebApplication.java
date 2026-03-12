@@ -2,8 +2,10 @@ package com.capybara349.weblogweb;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan({"com.capybara349.*"})
 public class WeblogWebApplication {
 
     public static void main(String[] args) {
