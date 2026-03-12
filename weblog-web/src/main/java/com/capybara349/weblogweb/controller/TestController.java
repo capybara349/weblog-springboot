@@ -1,6 +1,7 @@
 package com.capybara349.weblogweb.controller;
 
 import com.capybara349.weblogmodulecommon.aspect.ApiOperationLog;
+import com.capybara349.weblogmodulecommon.utils.Response;
 import com.capybara349.weblogweb.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -22,14 +23,14 @@ public class TestController {
 
     @PostMapping("/test")
     @ApiOperationLog(description = "测试接口")
-    public ResponseEntity<String> test(@RequestBody @Validated User user, BindingResult bindingResult) {
+    public Response test(@RequestBody @Validated User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMsg = bindingResult.getFieldErrors()
                     .stream()
                     .map(FieldError::getDefaultMessage)
                     .collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(errorMsg);
+            return Response.fail(errorMsg);
         }
-        return ResponseEntity.ok("参数没有任何问题");
+        return Response.success();
     }
 }
