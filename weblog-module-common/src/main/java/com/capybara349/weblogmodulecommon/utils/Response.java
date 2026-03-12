@@ -15,8 +15,6 @@ import java.io.Serializable;
 @Data
 public class Response<T> implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     // 是否成功，默认为 true
     private boolean success = true;
     // 响应消息

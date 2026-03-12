@@ -15,6 +15,17 @@
 
 
     <dependencies>
+        <!-- 依赖 common 和 admin 模块 -->
+        <dependency>
+            <groupId>com.capybara349</groupId>
+            <artifactId>weblog-module-common</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.capybara349</groupId>
+            <artifactId>weblog-module-admin</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <!-- Web 依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -32,6 +43,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- 参数校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
@@ -42,17 +54,7 @@
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
         </dependency>
-        <!-- 依赖 common 和 admin 模块 -->
-        <dependency>
-            <groupId>com.capybara349</groupId>
-            <artifactId>weblog-module-common</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.capybara349</groupId>
-            <artifactId>weblog-module-admin</artifactId>
-            <version>${revision}</version>
-        </dependency>
+
     </dependencies>
 
     <build>
