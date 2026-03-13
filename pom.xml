@@ -48,6 +48,10 @@
 
         <!-- 接口调试相关 -->
         <knife4j.version>4.3.0</knife4j.version>
+
+        <!-- Mybatis-plus 和 SQL 日志打印 -->
+        <mybatis-plus.version>3.5.2</mybatis-plus.version>
+        <p6spy.version>3.9.1</p6spy.version>
     </properties>
 
     <!-- 统一依赖管理 -->
@@ -91,6 +95,19 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
+            </dependency>
+
+            <!-- Mybatis-plus 和 SQL 日志打印 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>p6spy</groupId>
+                <artifactId>p6spy</artifactId>
+                <version>${p6spy.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
