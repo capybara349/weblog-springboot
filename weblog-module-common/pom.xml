@@ -12,6 +12,9 @@
 
     <artifactId>weblog-module-common</artifactId>
     <name>weblog-module-common</name>
+    <description>weblog-module-common(此模块用于存放一些通用的功能)</description>
+
+
     <dependencies>
         <!-- web -->
         <dependency>
@@ -62,6 +65,6 @@
         </dependency>
     </dependencies>
 
-    <description>weblog-module-common(此模块用于存放一些通用的功能)</description>
+
 
 </project>
