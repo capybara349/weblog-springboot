@@ -6,3 +6,7 @@ spring:
   profiles:
     # 默认激活开发环境
     active: dev
+
+jwt:
+  issuer: capybara349
+  secret: zL3KH852ynMtDA5fR1GdmuSc1InmdvPlwjIBxd1GwU6QUDUN+vhrsMlNWeFc/mZaDjA91mOARNPxdIv6583xnA==

@@ -29,7 +29,7 @@ public class Knife4jConfig {
                 .groupName("Web 前台接口")
                 .select()
                 // 这里指定 Controller 扫描包路径
-                .apis(RequestHandlerSelectors.basePackage("com.capybara349.weblogweb.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.capybara349.weblog.web.controller"))
                 .paths(PathSelectors.any())
                 .build();
         return docket;

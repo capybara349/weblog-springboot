@@ -1,7 +1,9 @@
 package com.capybara349.weblog.common.domain.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.capybara349.weblog.common.domain.dos.UserDO;
+
 
 /**
  *
@@ -9,4 +11,9 @@ import com.capybara349.weblog.common.domain.dos.UserDO;
  * &#064;date 2026.03.13 10:44
  */
 public interface UserMapper extends BaseMapper<UserDO> {
+    default UserDO findByUsername(String username) {
+        LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserDO::getUsername, username);
+        return selectOne(wrapper);
+    }
 }
