@@ -8,5 +8,11 @@ spring:
     active: dev
 
 jwt:
+  # token 过期时间（单位：分钟） 24*60
+  tokenExpireTime: 1440
+  # token 请求头中的 key 值
+  tokenHeaderKey: Authorization
+  # token 请求头中的 value 值前缀
+  tokenPrefix: Bearer
   issuer: capybara349
   secret: zL3KH852ynMtDA5fR1GdmuSc1InmdvPlwjIBxd1GwU6QUDUN+vhrsMlNWeFc/mZaDjA91mOARNPxdIv6583xnA==
