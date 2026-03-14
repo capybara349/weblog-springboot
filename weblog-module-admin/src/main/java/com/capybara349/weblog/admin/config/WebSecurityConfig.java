@@ -7,6 +7,7 @@ import com.capybara349.weblog.jwt.handler.RestAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,11 +16,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * 过覆盖方法 类可以配置认证、授权规则、自定义登录页面、注销等。
+ *
+ * @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+ * 这是一个 Spring Security 注解，用于启用方法级别的安全性设置。prePostEnabled = true 表示启用 @PreAuthorize 和 @PostAuthorize 注解，securedEnabled = true 表示启用 @Secured 注解。
+ * 这意味着您可以在方法级别使用这些注解来定义访问控制规则。
  * &#064;author capybara349 </br>
  * &#064;date 2026.03.13 14:04
  */
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationSecurityConfig jwtAuthenticationSecurityConfig;
