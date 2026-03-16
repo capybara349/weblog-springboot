@@ -1,6 +1,6 @@
 package com.capybara349.weblog.admin.controller;
 
-import com.capybara349.weblog.admin.model.FindCategoryPageListReqVO;
+import com.capybara349.weblog.admin.model.vo.category.FindCategoryPageListReqVO;
 import com.capybara349.weblog.admin.model.vo.category.AddCategoryReqVO;
 import com.capybara349.weblog.admin.model.vo.category.DeleteCategoryReqVO;
 import com.capybara349.weblog.admin.service.AdminCategoryService;
@@ -38,8 +38,8 @@ public class AdminCategoryController {
     @PostMapping("/category/list")
     @ApiOperation(value = "分类分页数据获取")
     @ApiOperationLog(description = "分类分页数据获取")
-    public PageResponse findCategoryList(@RequestBody @Validated FindCategoryPageListReqVO findCategoryPageListReqVO) {
-        return categoryService.findCategoryList(findCategoryPageListReqVO);
+    public PageResponse findCategoryPageList(@RequestBody @Validated FindCategoryPageListReqVO findCategoryPageListReqVO) {
+        return categoryService.findCategoryPageList(findCategoryPageListReqVO);
     }
 
     @PostMapping("/category/delete")

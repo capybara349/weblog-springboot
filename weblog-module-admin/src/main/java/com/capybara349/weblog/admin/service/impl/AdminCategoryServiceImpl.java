@@ -2,7 +2,7 @@ package com.capybara349.weblog.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.capybara349.weblog.admin.model.FindCategoryPageListReqVO;
+import com.capybara349.weblog.admin.model.vo.category.FindCategoryPageListReqVO;
 import com.capybara349.weblog.admin.model.vo.category.AddCategoryReqVO;
 import com.capybara349.weblog.admin.model.vo.category.DeleteCategoryReqVO;
 import com.capybara349.weblog.admin.model.vo.category.FindCategoryPageListRspVO;
@@ -63,28 +63,17 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
     }
 
     @Override
-    public PageResponse findCategoryList(FindCategoryPageListReqVO findCategoryPageListReqVO) {
+    public PageResponse findCategoryPageList(FindCategoryPageListReqVO findCategoryPageListReqVO) {
         // 获取当前页、以及每页需要展示的数据数量
         Long current = findCategoryPageListReqVO.getCurrent();
         Long size = findCategoryPageListReqVO.getSize();
-
-        // 分页对象(查询第几页、每页多少数据)
-        Page<CategoryDO> page = new Page<>(current, size);
-
-        // 构建查询条件
-        LambdaQueryWrapper<CategoryDO> wrapper = new LambdaQueryWrapper<>();
 
         String name = findCategoryPageListReqVO.getName();
         LocalDate startDate = findCategoryPageListReqVO.getStartDate();
         LocalDate endDate = findCategoryPageListReqVO.getEndDate();
 
-        wrapper
-                .like(StringUtils.isNotBlank(name), CategoryDO::getName, name)
-                .ge(Objects.nonNull(startDate), CategoryDO::getCreateTime, startDate)
-                .le(Objects.nonNull(endDate), CategoryDO::getCreateTime, endDate)
-                .orderByDesc(CategoryDO::getCreateTime);//按时间倒序
         // 执行分页查询
-        Page<CategoryDO> categoryDOPage = categoryMapper.selectPage(page, wrapper);
+        Page<CategoryDO> categoryDOPage = categoryMapper.selectPageList(current, size, name, startDate, endDate);
 
         List<CategoryDO> categoryDOS = categoryDOPage.getRecords();
 

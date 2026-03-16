@@ -1,6 +1,6 @@
 package com.capybara349.weblog.admin.service;
 
-import com.capybara349.weblog.admin.model.FindCategoryPageListReqVO;
+import com.capybara349.weblog.admin.model.vo.category.FindCategoryPageListReqVO;
 import com.capybara349.weblog.admin.model.vo.category.AddCategoryReqVO;
 import com.capybara349.weblog.admin.model.vo.category.DeleteCategoryReqVO;
 import com.capybara349.weblog.common.utils.PageResponse;
@@ -23,7 +23,7 @@ public interface AdminCategoryService {
      * @param findCategoryPageListReqVO
      * @return
      */
-    PageResponse findCategoryList(FindCategoryPageListReqVO findCategoryPageListReqVO);
+    PageResponse findCategoryPageList(FindCategoryPageListReqVO findCategoryPageListReqVO);
     /**
      * 删除分类
      * @param deleteCategoryReqVO
