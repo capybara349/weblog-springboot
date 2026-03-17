@@ -1,6 +1,7 @@
 package com.capybara349.weblog.web.service;
 
 import com.capybara349.weblog.common.utils.Response;
+import com.capybara349.weblog.web.model.vo.tag.FindTagArticlePageListReqVO;
 
 /**
  *
@@ -13,4 +14,11 @@ public interface TagService {
      * @return
      */
     Response findTagList();
+    /**
+     * 获取标签下文章分页列表
+     * @param findTagArticlePageListReqVO
+     * @return
+     */
+    Response findTagPageList(FindTagArticlePageListReqVO findTagArticlePageListReqVO);
+
 }
