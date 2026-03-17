@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan({"com.capybara349.weblog.*"})
-@MapperScan("com.capybara349.weblog.common.domain.mapper")
 public class WeblogWebApplication {
 
     public static void main(String[] args) {

@@ -36,8 +36,15 @@ public interface AdminTagService {
 
     /**
      * 根据标签关键词模糊查询
+     *
      * @param searchTagsReqVO
      * @return
      */
     Response searchTags(SearchTagsReqVO searchTagsReqVO);
+
+    /**
+     * 查询标签 Select 列表数据
+     * @return
+     */
+    Response findTagSelectList();
 }
