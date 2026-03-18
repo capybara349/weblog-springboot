@@ -2,6 +2,7 @@ package com.capybara349.weblog.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.capybara349.weblog.admin.convert.ArticleDetailConvert;
+import com.capybara349.weblog.admin.event.ReadArticleEvent;
 import com.capybara349.weblog.admin.model.vo.article.*;
 import com.capybara349.weblog.admin.service.AdminArticleService;
 import com.capybara349.weblog.common.domain.dos.*;
@@ -14,6 +15,7 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -199,6 +201,11 @@ public class AdminArticleServiceImpl implements AdminArticleService {
         return Response.success(vo);
     }
 
+    /**
+     * 更新文章
+     * @param updateArticleReqVO
+     * @return
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Response updateArticle(UpdateArticleReqVO updateArticleReqVO) {
