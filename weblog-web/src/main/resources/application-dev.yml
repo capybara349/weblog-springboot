@@ -36,4 +36,4 @@ minio:
 # Lucene 全文检索
 #=================================================================
 lucene:
-  indexDir: /Users/tonychen/logs/lucene-index
+  indexDir: ${user.home}/logs/lucene-index
