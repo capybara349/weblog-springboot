@@ -39,10 +39,19 @@ public interface AdminArticleService {
      * @return
      */
     Response findArticleDetail(FindArticleDetailReqVO findArticleDetailReqVO);
+
     /**
      * 更新文章
+     *
      * @param updateArticleReqVO
      * @return
      */
     Response updateArticle(UpdateArticleReqVO updateArticleReqVO);
+    /**
+     * 更新文章是否置顶
+     * @param updateArticleIsTopReqVO
+     * @return
+     */
+    Response updateArticleIsTop(UpdateArticleIsTopReqVO updateArticleIsTopReqVO);
+
 }

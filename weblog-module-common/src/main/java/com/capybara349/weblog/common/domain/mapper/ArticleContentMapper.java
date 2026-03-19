@@ -12,6 +12,7 @@ import com.capybara349.weblog.common.domain.dos.ArticleContentDO;
 public interface ArticleContentMapper extends BaseMapper<ArticleContentDO> {
     /**
      * 根据文章 ID 删除记录
+     *
      * @param articleId
      * @return
      */
@@ -19,8 +20,10 @@ public interface ArticleContentMapper extends BaseMapper<ArticleContentDO> {
         return delete(Wrappers.<ArticleContentDO>lambdaQuery()
                 .eq(ArticleContentDO::getArticleId, articleId));
     }
+
     /**
      * 根据文章 ID 查询
+     *
      * @param articleId
      * @return
      */
@@ -28,8 +31,10 @@ public interface ArticleContentMapper extends BaseMapper<ArticleContentDO> {
         return selectOne(Wrappers.<ArticleContentDO>lambdaQuery()
                 .eq(ArticleContentDO::getArticleId, articleId));
     }
+
     /**
      * 通过文章 ID 更新
+     *
      * @param articleContentDO
      */
     default int updateByArticleId(ArticleContentDO articleContentDO) {

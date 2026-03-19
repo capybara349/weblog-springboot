@@ -15,6 +15,7 @@ import com.capybara349.weblog.common.utils.Response;
 import com.capybara349.weblog.web.convert.ArticleConvert;
 import com.capybara349.weblog.web.model.vo.category.FindCategoryArticlePageListReqVO;
 import com.capybara349.weblog.web.model.vo.category.FindCategoryArticlePageListRspVO;
+import com.capybara349.weblog.web.model.vo.category.FindCategoryListReqVO;
 import com.capybara349.weblog.web.model.vo.category.FindCategoryListRspVO;
 import com.capybara349.weblog.web.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
@@ -110,6 +111,39 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         return PageResponse.success(page, vos);
+    }
+    /**
+     * 获取分类列表
+     *
+     * @return
+     */
+    @Override
+    public Response findCategoryList(FindCategoryListReqVO findCategoryListReqVO) {
+        Long size = findCategoryListReqVO.getSize();
+
+        List<CategoryDO> categoryDOS = null;
+        // 如果接口入参中未指定 size
+        if (Objects.isNull(size) || size == 0) {
+            // 查询所有分类
+            categoryDOS = categoryMapper.selectList(Wrappers.emptyWrapper());
+        } else {
+            // 否则查询指定的数量
+            categoryDOS = categoryMapper.selectByLimit(size);
+        }
+
+        // DO 转 VO
+        List<FindCategoryListRspVO> vos = null;
+        if (!CollectionUtils.isEmpty(categoryDOS)) {
+            vos = categoryDOS.stream()
+                    .map(categoryDO -> FindCategoryListRspVO.builder()
+                            .id(categoryDO.getId())
+                            .name(categoryDO.getName())
+                            .articlesTotal(categoryDO.getArticlesTotal())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
+        return Response.success(vos);
     }
 }
 

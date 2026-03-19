@@ -2,6 +2,7 @@ package com.capybara349.weblog.web.service;
 
 import com.capybara349.weblog.common.utils.Response;
 import com.capybara349.weblog.web.model.vo.category.FindCategoryArticlePageListReqVO;
+import com.capybara349.weblog.web.model.vo.category.FindCategoryListReqVO;
 
 /**
  *
@@ -20,6 +21,11 @@ public interface CategoryService {
      * @return
      */
     Response findCategoryArticlePageList(FindCategoryArticlePageListReqVO findCategoryArticlePageListReqVO);
+    /**
+     * 获取分类列表
+     * @return
+     */
+    Response findCategoryList(FindCategoryListReqVO findCategoryListReqVO);
 
 }
 

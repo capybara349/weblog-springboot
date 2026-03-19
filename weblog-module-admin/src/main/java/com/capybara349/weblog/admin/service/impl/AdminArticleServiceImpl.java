@@ -168,6 +168,7 @@ public class AdminArticleServiceImpl implements AdminArticleService {
                             .title(articleDO.getTitle())
                             .cover(articleDO.getCover())
                             .createTime(articleDO.getCreateTime())
+                            .isTop(articleDO.getWeight() > 0)
                             .build())
                     .collect(Collectors.toList());
         }
@@ -275,6 +276,39 @@ public class AdminArticleServiceImpl implements AdminArticleService {
         return Response.success();
     }
 
+    /**
+     * 更新文章是否置顶
+     * 默认 weight 权重值为 0， 即不参与置顶；
+     * 若用户设置某篇文章为置顶；
+     * 则获取表中最大的权重值，并加一；
+     * 最后，更新该篇文章的权重值；
+     * @param updateArticleIsTopReqVO
+     * @return
+     */
+    @Override
+    public Response updateArticleIsTop(UpdateArticleIsTopReqVO updateArticleIsTopReqVO) {
+        Long articleId = updateArticleIsTopReqVO.getId();
+        Boolean isTop = updateArticleIsTopReqVO.getIsTop();
+
+        // 默认权重为 0
+        Integer weight = 0;
+        // 若设置为置顶
+        if (isTop) {
+            // 查询出表中最大的权重值
+            ArticleDO articleDO = articleMapper.selectMaxWeight();
+            Integer maxWeight = articleDO.getWeight();
+            // 最大权重值加一
+            weight = maxWeight + 1;
+        }
+
+        // 更新该篇文章的权重值
+        articleMapper.updateById(ArticleDO.builder()
+                .id(articleId)
+                .weight(weight)
+                .build());
+
+        return Response.success();
+    }
 
     /**
      * 保存标签

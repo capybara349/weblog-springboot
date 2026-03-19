@@ -1,6 +1,7 @@
 package com.capybara349.weblog.admin.event.subscriber;
 
 import com.capybara349.weblog.admin.event.UpdateArticleEvent;
+import com.capybara349.weblog.admin.service.AdminStatisticsService;
 import com.capybara349.weblog.common.constant.Constants;
 import com.capybara349.weblog.common.domain.dos.ArticleContentDO;
 import com.capybara349.weblog.common.domain.dos.ArticleDO;
@@ -33,6 +34,8 @@ public class UpdateArticleSubscriber implements ApplicationListener<UpdateArticl
     private ArticleMapper articleMapper;
     @Autowired
     private ArticleContentMapper articleContentMapper;
+    @Autowired
+    private AdminStatisticsService statisticsService;
 
     @Override
     @Async("threadPoolTaskExecutor")
@@ -65,5 +68,13 @@ public class UpdateArticleSubscriber implements ApplicationListener<UpdateArticl
         long count = luceneHelper.updateDocument(ArticleIndex.NAME, document, condition);
 
         log.info("==> 更新文章对应 Lucene 文档结束，articleId: {}，受影响行数: {}", articleId, count);
+
+        // 重新统计各分类下文章总数
+        statisticsService.statisticsCategoryArticleTotal();
+        log.info("==> 重新统计各分类下文章总数");
+
+        // 重新统计各标签下文章总数
+        statisticsService.statisticsTagArticleTotal();
+        log.info("==> 重新统计各标签下文章总数");
     }
 }
