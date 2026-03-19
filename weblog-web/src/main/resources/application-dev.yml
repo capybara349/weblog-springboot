@@ -32,3 +32,8 @@ minio:
   accessKey: capybara349
   secretKey: capybara349
   bucketName: weblog
+#=================================================================
+# Lucene 全文检索
+#=================================================================
+lucene:
+  indexDir: /Users/tonychen/logs/lucene-index

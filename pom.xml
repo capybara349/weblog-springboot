@@ -29,6 +29,8 @@
         <module>weblog-module-common</module>
         <!-- JWT 模块 -->
         <module>weblog-module-jwt</module>
+        <!-- 站内搜索模块 -->
+        <module>weblog-module-search</module>
     </modules>
     <!-- 统一管理版本号 -->
     <properties>
@@ -65,6 +67,12 @@
 
         <!-- commonmark-java 是 CommonMark规范的 Java 实现库 -->
         <commonmark.version>0.20.0</commonmark.version>
+
+        <!-- 全文本搜索引擎 Lucene -->
+        <lucene.version>8.11.1</lucene.version>
+
+        <!-- 涉及到操作文件的 Common 工具包-->
+        <commons-io.version>2.11.0</commons-io.version>
     </properties>
 
     <!-- 统一依赖管理 -->
@@ -88,6 +96,11 @@
                 <version>${revision}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.quanxiaoha</groupId>
+                <artifactId>weblog-module-search</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <!-- 常用工具库 -->
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -188,7 +201,40 @@
                 <version>${commonmark.version}</version>
             </dependency>
 
+            <!-- lucene 全文检索引擎 -->
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
 
+            <!-- 中文分词 -->
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers-smartcn</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+
+            <!-- 关键词高亮 -->
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-highlighter</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+
+            <!-- 查询解析器 -->
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-queryparser</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+
+            <!-- 工具包 -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
