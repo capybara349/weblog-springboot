@@ -1,7 +1,7 @@
 package com.capybara349.weblog.web.markdown;
 
-import com.capybara349.weblog.web.markdown.provider.NofollowLinkAttributeProvider;
 import com.capybara349.weblog.web.markdown.renderer.ImageNodeRenderer;
+import com.capybara349.weblog.web.markdown.renderer.LinkNodeRenderer;
 import org.commonmark.Extension;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.ext.heading.anchor.HeadingAnchorExtension;
@@ -45,7 +45,7 @@ public class MarkdownHelper {
         PARSER = Parser.builder().extensions(extensions).build();
         HTML_RENDERER = HtmlRenderer.builder()
                 .extensions(extensions)
-                .attributeProviderFactory(context -> new NofollowLinkAttributeProvider())
+                .nodeRendererFactory(context -> new LinkNodeRenderer(context))
                 .nodeRendererFactory(context -> new ImageNodeRenderer(context))
                 .build();
     }

@@ -19,6 +19,7 @@ import com.capybara349.weblog.web.model.vo.article.FindPreNextArticleRspVO;
 import com.capybara349.weblog.web.model.vo.category.FindCategoryListRspVO;
 import com.capybara349.weblog.web.model.vo.tag.FindTagListRspVO;
 import com.capybara349.weblog.web.service.ArticleService;
+import com.capybara349.weblog.web.utils.MarkdownStatsUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +166,10 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 查询正文
         ArticleContentDO articleContentDO = articleContentMapper.selectByArticleId(articleId);
+        String content = articleContentDO.getContent();
+
+        // 计算 md 正文字数
+        Integer totalWords = MarkdownStatsUtil.calculateWordCount(content);
 
         // DO 转 VO
         FindArticleDetailRspVO vo = FindArticleDetailRspVO.builder()
@@ -172,6 +177,8 @@ public class ArticleServiceImpl implements ArticleService {
                 .createTime(articleDO.getCreateTime())
                 .content(MarkdownHelper.convertMarkdown2Html(articleContentDO.getContent()))
                 .readNum(articleDO.getReadNum())
+                .totalWords(totalWords)
+                .readTime(MarkdownStatsUtil.calculateReadingTime(totalWords))
                 .build();
 
         // 查询所属分类
