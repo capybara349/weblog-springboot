@@ -13,34 +13,33 @@ import java.time.LocalDateTime;
 /**
  *
  * &#064;author capybara349 </br>
- * &#064;date 2026.03.17 13:45
+ * &#064;date 2026.03.20 14:15
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@TableName("t_article")
-public class ArticleDO {
+@TableName("t_wiki_catalog")
+public class WikiCatalogDO {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private Long wikiId;
+
+    private Long articleId;
+
     private String title;
 
-    private String cover;
+    private Integer level;
 
-    private String summary;
+    private Long parentId;
+
+    private Integer sort;
 
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
 
     private Boolean isDeleted;
-
-    private Long readNum;
-
-    private Integer weight;
-
-    private Integer type;
 }
-

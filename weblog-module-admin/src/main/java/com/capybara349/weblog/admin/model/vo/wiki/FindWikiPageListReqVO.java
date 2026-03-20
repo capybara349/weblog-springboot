@@ -1,4 +1,4 @@
-package com.capybara349.weblog.admin.model.vo.article;
+package com.capybara349.weblog.admin.model.vo.wiki;
 
 import com.capybara349.weblog.common.model.BasePageQuery;
 import io.swagger.annotations.ApiModel;
@@ -12,17 +12,17 @@ import java.time.LocalDate;
 /**
  *
  * &#064;author capybara349 </br>
- * &#064;date 2026.03.17 14:22
+ * &#064;date 2026.03.20 14:33
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ApiModel(value = "查询文章分页数据入参 VO")
-public class FindArticlePageListReqVO extends BasePageQuery {
+@ApiModel(value = "查询知识库分页数据入参 VO")
+public class FindWikiPageListReqVO extends BasePageQuery {
 
     /**
-     * 文章标题
+     * 知识库标题
      */
     private String title;
 
@@ -35,9 +35,5 @@ public class FindArticlePageListReqVO extends BasePageQuery {
      * 发布的结束日期
      */
     private LocalDate endDate;
-    /**
-     * 文章类型
-     */
-    private Integer type;
-}
 
+}
