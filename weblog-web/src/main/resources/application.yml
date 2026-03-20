@@ -20,3 +20,6 @@ jwt:
   tokenPrefix: Bearer
   issuer: capybara349
   secret: zL3KH852ynMtDA5fR1GdmuSc1InmdvPlwjIBxd1GwU6QUDUN+vhrsMlNWeFc/mZaDjA91mOARNPxdIv6583xnA==
+
+# 鬼鬼 API 密钥
+api-key: 1f8de01c3c196178f9d3769be770617d
