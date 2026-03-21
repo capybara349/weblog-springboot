@@ -10,6 +10,7 @@ import com.capybara349.weblog.web.event.PublishCommentEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,8 @@ public class PublishCommentSubscriber implements ApplicationListener<PublishComm
     private BlogSettingsMapper blogSettingsMapper;
     @Autowired
     private MailHelper mailHelper;
+    @Value("${domain.url}")
+    private String domain;
 
     @Override
     @Async("threadPoolTaskExecutor")
@@ -60,8 +63,6 @@ public class PublishCommentSubscriber implements ApplicationListener<PublishComm
         boolean isCommentExamineOpen = blogSettingsDO.getIsCommentExamineOpen();
         // 是否开启了敏感词过滤
         boolean isSensiWordOpen = blogSettingsDO.getIsCommentSensiWordOpen();
-        // 博客访问地址
-        String domain = "http://localhost:5173/#";
 
         // 二级评论，并且状态为 “正常”, 邮件通知被评论的用户
         if (Objects.nonNull(replyCommentId)
