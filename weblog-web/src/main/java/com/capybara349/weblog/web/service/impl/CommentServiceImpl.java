@@ -1,10 +1,16 @@
 package com.capybara349.weblog.web.service.impl;
 
+import com.capybara349.weblog.common.domain.dos.BlogSettingsDO;
+import com.capybara349.weblog.common.domain.dos.CommentDO;
+import com.capybara349.weblog.common.domain.mapper.BlogSettingsMapper;
+import com.capybara349.weblog.common.domain.mapper.CommentMapper;
+import com.capybara349.weblog.common.enums.CommentStatusEnum;
 import com.capybara349.weblog.common.enums.ResponseCodeEnum;
 import com.capybara349.weblog.common.exception.BizException;
 import com.capybara349.weblog.common.utils.Response;
-import com.capybara349.weblog.web.model.vo.comment.FindQQUserInfoReqVO;
-import com.capybara349.weblog.web.model.vo.comment.FindQQUserInfoRspVO;
+import com.capybara349.weblog.web.convert.CommentConvert;
+import com.capybara349.weblog.web.event.PublishCommentEvent;
+import com.capybara349.weblog.web.model.vo.comment.*;
 import com.capybara349.weblog.web.service.CommentService;
 import com.capybara349.weblog.web.utils.StringUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,13 +18,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
+import toolgood.words.IllegalWordsSearch;
+import toolgood.words.IllegalWordsSearchResult;
 
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -31,6 +41,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private BlogSettingsMapper blogSettingsMapper;
+    @Autowired
+    private CommentMapper commentMapper;
+    @Autowired
+    private IllegalWordsSearch wordsSearch;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Value("${api-key}")
     private String apiKey;
@@ -75,5 +93,150 @@ public class CommentServiceImpl implements CommentService {
             throw new RuntimeException(e);
         }
     }
+    /**
+     * 发布评论
+     *
+     * @param publishCommentReqVO
+     * @return
+     */
+    @Override
+    public Response publishComment(PublishCommentReqVO publishCommentReqVO) {
+        // 回复的评论 ID
+        Long replyCommentId = publishCommentReqVO.getReplyCommentId();
+        // 评论内容
+        String content = publishCommentReqVO.getContent();
+        // 昵称
+        String nickname = publishCommentReqVO.getNickname();
 
+        // 查询博客设置相关信息（约定的 ID 为 1）
+        BlogSettingsDO blogSettingsDO = blogSettingsMapper.selectById(1L);
+        // 是否开启了敏感词过滤
+        boolean isCommentSensiWordOpen = blogSettingsDO.getIsCommentSensiWordOpen();
+        // 是否开启了审核
+        boolean isCommentExamineOpen = blogSettingsDO.getIsCommentExamineOpen();
+
+        // 设置默认状态（正常）
+        Integer status = CommentStatusEnum.NORMAL.getCode();
+        // 审核不通过原因
+        String reason = "";
+
+        // 如果开启了审核, 设置状态为待审核，等待博主后台审核通过
+        if (isCommentExamineOpen) {
+            status = CommentStatusEnum.WAIT_EXAMINE.getCode();
+        }
+
+        // 评论内容是否包含敏感词
+        boolean isContainSensitiveWord = false;
+        // 是否开启了敏感词过滤
+        if (isCommentSensiWordOpen) {
+            // 校验评论中是否包含敏感词
+            isContainSensitiveWord = wordsSearch.ContainsAny(content);
+
+            if (isContainSensitiveWord) {
+                // 若包含敏感词，设置状态为审核不通过
+                status = CommentStatusEnum.EXAMINE_FAILED.getCode();
+                // 匹配到的所有敏感词组
+                List<IllegalWordsSearchResult> results = wordsSearch.FindAll(content);
+                List<String> keywords = results.stream().map(result -> result.Keyword).collect(Collectors.toList());
+                // 不同过的原因
+                reason = String.format("系统自动拦截，包含敏感词：%s", keywords);
+                log.warn("此评论内容中包含敏感词: {}, content: {}", keywords, content);
+            }
+        }
+
+        // 构建 DO 对象
+        CommentDO commentDO = CommentDO.builder()
+                .avatar(publishCommentReqVO.getAvatar())
+                .content(content)
+                .mail(publishCommentReqVO.getMail())
+                .createTime(LocalDateTime.now())
+                .nickname(nickname)
+                .routerUrl(publishCommentReqVO.getRouterUrl())
+                .website(publishCommentReqVO.getWebsite())
+                .replyCommentId(replyCommentId)
+                .parentCommentId(publishCommentReqVO.getParentCommentId())
+                .status(status)
+                .reason(reason)
+                .build();
+
+        // 新增评论
+        commentMapper.insert(commentDO);
+
+        Long commentId = commentDO.getId();
+
+        // 发送评论发布事件
+        eventPublisher.publishEvent(new PublishCommentEvent(this, commentId));
+
+
+        // 给予前端对应的提示信息
+        if (isContainSensitiveWord)
+            throw new BizException(ResponseCodeEnum.COMMENT_CONTAIN_SENSITIVE_WORD);
+
+        if (Objects.equals(status, CommentStatusEnum.WAIT_EXAMINE.getCode()))
+            throw new BizException(ResponseCodeEnum.COMMENT_WAIT_EXAMINE);
+
+
+        return Response.success();
+    }
+
+    /**
+     * 查询页面所有评论:
+     * 拿到当前的路由地址后，查询该路由地址下所有评论，仅查询状态正常的，那些待审核、或者审核不通过的，无须展示出来；
+     * 获取评论总数，若查询出来的记录数不为空，则开始 DO 转 VO 类操作；
+     * 先组合一级评论数据，即过滤 parentCommentId 父级 ID 字段为空的数据；
+     * 再循环一级评论，过滤出下面的子评论数据，并按发布时间增序排列；
+     * 另外，如果子评论的 replayCommentId 不等于一级评论 ID, 则前端则需要展示【回复 @ xxx】，便开始设置回复昵称；
+     * 最终将组合好的评论数据返回给前端；
+     * @param findCommentListReqVO
+     * @return
+     */
+    @Override
+    public Response findCommentList(FindCommentListReqVO findCommentListReqVO) {
+        // 路由地址
+        String routerUrl = findCommentListReqVO.getRouterUrl();
+
+        // 查询该路由地址下所有评论（仅查询状态正常的）
+        List<CommentDO> commentDOS = commentMapper.selectByRouterUrlAndStatus(routerUrl, CommentStatusEnum.NORMAL.getCode());
+        // 总评论数
+        Integer total = commentDOS.size();
+
+        List<FindCommentItemRspVO> vos = null;
+        // DO 转 VO
+        if (!CollectionUtils.isEmpty(commentDOS)) {
+            // 一级评论
+            vos = commentDOS.stream()
+                    .filter(commentDO -> Objects.isNull(commentDO.getParentCommentId())) // parentCommentId 父级 ID 为空，则表示为一级评论
+                    .map(commentDO -> CommentConvert.INSTANCE.convertDO2VO(commentDO))
+                    .collect(Collectors.toList());
+
+            // 循环设置评论回复数据
+            vos.forEach(vo -> {
+                Long commentId = vo.getId();
+                List<FindCommentItemRspVO> childComments = commentDOS.stream()
+                        .filter(commentDO -> Objects.equals(commentDO.getParentCommentId(), commentId)) // 过滤出一级评论下所有子评论
+                        .sorted(Comparator.comparing(CommentDO::getCreateTime)) // 按发布时间升序排列
+                        .map(commentDO -> {
+                            FindCommentItemRspVO findPageCommentRspVO = CommentConvert.INSTANCE.convertDO2VO(commentDO);
+                            Long replyCommentId = commentDO.getReplyCommentId();
+                            // 若二级评论的 replayCommentId 不等于一级评论 ID, 前端则需要展示【回复 @ xxx】，需要设置回复昵称
+                            if (!Objects.equals(replyCommentId, commentId)) {
+                                // 设置回复用户的昵称
+                                Optional<CommentDO> optionalCommentDO = commentDOS.stream()
+                                        .filter(commentDO1 -> Objects.equals(commentDO1.getId(), replyCommentId)).findFirst();
+                                if (optionalCommentDO.isPresent()) {
+                                    findPageCommentRspVO.setReplyNickname(optionalCommentDO.get().getNickname());
+                                }
+                            }
+                            return findPageCommentRspVO;
+                        }).collect(Collectors.toList());
+
+                vo.setChildComments(childComments);
+            });
+        }
+
+        return Response.success(FindCommentListRspVO.builder()
+                .total(total)
+                .comments(vos)
+                .build());
+    }
 }

@@ -1,7 +1,9 @@
 package com.capybara349.weblog.web.service;
 
 import com.capybara349.weblog.common.utils.Response;
+import com.capybara349.weblog.web.model.vo.comment.FindCommentListReqVO;
 import com.capybara349.weblog.web.model.vo.comment.FindQQUserInfoReqVO;
+import com.capybara349.weblog.web.model.vo.comment.PublishCommentReqVO;
 
 /**
  *
@@ -16,6 +18,20 @@ public interface CommentService {
      * @return
      */
     Response findQQUserInfo(FindQQUserInfoReqVO findQQUserInfoReqVO);
+
+    /**
+     * 发布评论
+     *
+     * @param publishCommentReqVO
+     * @return
+     */
+    Response publishComment(PublishCommentReqVO publishCommentReqVO);
+    /**
+     * 查询页面所有评论
+     * @param findCommentListReqVO
+     * @return
+     */
+    Response findCommentList(FindCommentListReqVO findCommentListReqVO);
 
 }
 
