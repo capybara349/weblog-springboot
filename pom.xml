@@ -79,6 +79,9 @@
 
         <!-- 敏感词(非法词/脏字)检测过滤组件 -->
         <toolgood-words.version>3.1.0.1</toolgood-words.version>
+
+        <!--滑块验证码依赖包 -->
+        <tianai-captcha.version>1.5.4</tianai-captcha.version>
     </properties>
 
     <!-- 统一依赖管理 -->
@@ -253,6 +256,13 @@
                 <groupId>io.github.toolgood</groupId>
                 <artifactId>toolgood-words</artifactId>
                 <version>${toolgood-words.version}</version>
+            </dependency>
+
+            <!-- 行为验证码 -->
+            <dependency>
+                <groupId>cloud.tianai.captcha</groupId>
+                <artifactId>tianai-captcha-springboot-starter</artifactId>
+                <version>${tianai-captcha.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
