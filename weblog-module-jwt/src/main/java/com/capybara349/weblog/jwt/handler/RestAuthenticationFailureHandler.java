@@ -2,6 +2,7 @@ package com.capybara349.weblog.jwt.handler;
 
 import com.capybara349.weblog.common.enums.ResponseCodeEnum;
 import com.capybara349.weblog.common.utils.Response;
+import com.capybara349.weblog.jwt.exception.CaptchaVerificationFailedException;
 import com.capybara349.weblog.jwt.exception.UsernameOrPasswordNullException;
 import com.capybara349.weblog.jwt.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,9 @@ public class RestAuthenticationFailureHandler implements AuthenticationFailureHa
         } else if (exception instanceof BadCredentialsException){
             ResultUtil.fail(response, Response.fail(ResponseCodeEnum.USERNAME_OR_PWD_ERROR));
             return;
+        } else if (exception instanceof CaptchaVerificationFailedException) {
+            // 行为验证码错误
+            ResultUtil.fail(response, Response.fail(exception.getMessage()));
         }
         ResultUtil.fail(response, Response.fail(ResponseCodeEnum.LOGIN_FAIL));
     }
