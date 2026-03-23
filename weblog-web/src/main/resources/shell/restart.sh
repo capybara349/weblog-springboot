@@ -7,7 +7,7 @@
 
 APP_NAME="weblog-web-0.0.1-SNAPSHOT.jar"
 APP_PATH="/app/weblog/${APP_NAME}"
-JAVA_OPTS="-Xms300m -Xmx300m"
+JAVA_OPTS="-Xms256m -Xmx256m"
 SPRING_PROFILES="prod"
 PID_FILE="/app/weblog/app.pid"   # 可选，记录 PID 便于管理
 
@@ -53,7 +53,7 @@ function start_app() {
     echo "启动应用..."
     cd /app/weblog
     source /etc/profile   # 确保 java 命令可用
-    nohup java ${JAVA_OPTS} -jar ${APP_PATH} --spring.profiles.active=${SPRING_PROFILES} > /dev/null 2>&1 &
+    nohup java -jar ${APP_PATH} ${JAVA_OPTS} --spring.profiles.active=${SPRING_PROFILES} > /dev/null 2>&1 &
     local new_pid=$!
     echo "应用已启动，PID: ${new_pid}"
     echo ${new_pid} > ${PID_FILE}
