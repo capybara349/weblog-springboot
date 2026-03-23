@@ -2,10 +2,9 @@
 # ====================================================================
 #  脚本名称: restart.sh
 #  功能描述: 重启 Spring Boot 应用（weblog-web）
-#  动态获取 Java 路径
 # ====================================================================
 
-# 1. 动态获取 Java 绝对路径
+# 动态获取 Java 路径
 JAVA_CMD=$(command -v java 2>/dev/null)
 if [ -z "${JAVA_CMD}" ]; then
     echo "错误：未找到 java 命令，请确保 JAVA_HOME 已配置且 java 在 PATH 中。"
@@ -13,22 +12,29 @@ if [ -z "${JAVA_CMD}" ]; then
 fi
 echo "使用 Java: ${JAVA_CMD}"
 
-# 2. 应用配置
-APP_NAME="weblog-web-0.0.1-SNAPSHOT.jar"
-APP_PATH="/app/weblog/${APP_NAME}"
+# 应用配置
+APP_DIR="/app/weblog"
+APP_JAR=$(ls -t ${APP_DIR}/weblog-web-*.jar 2>/dev/null | head -1)
+
+if [ -z "${APP_JAR}" ]; then
+    echo "错误：在 ${APP_DIR} 下未找到任何 weblog-web-*.jar 文件！"
+    echo "当前目录内容："
+    ls -l ${APP_DIR}
+    exit 1
+fi
+echo "使用 jar 文件: ${APP_JAR}"
+
 JAVA_OPTS="-Xms300m -Xmx300m"
 SPRING_PROFILES="prod"
-PID_FILE="/app/weblog/app.pid"
-STARTUP_LOG="/app/weblog/startup.log"
+PID_FILE="${APP_DIR}/app.pid"
+STARTUP_LOG="${APP_DIR}/startup.log"
 
-# 3. 进程检测函数（精确匹配 java 进程）
+# 进程检测函数
 function get_pid() {
-    pgrep -f "java.*${APP_NAME}" 2>/dev/null
-    # 若 pgrep 不可用，可使用 ps：
-    # ps -ef | grep "java.*${APP_NAME}" | grep -v grep | awk '{print $2}'
+    pgrep -f "java.*$(basename ${APP_JAR})" 2>/dev/null
 }
 
-# 4. 停止应用
+# 停止应用
 function stop_app() {
     local pid=$(get_pid)
     if [ -z "${pid}" ]; then
@@ -60,16 +66,15 @@ function stop_app() {
     fi
 }
 
-# 5. 启动应用
+# 启动应用
 function start_app() {
     echo "启动应用..."
-    cd /app/weblog
+    cd ${APP_DIR}
     > ${STARTUP_LOG}
-    nohup ${JAVA_CMD} ${JAVA_OPTS} -jar ${APP_PATH} --spring.profiles.active=${SPRING_PROFILES} >> ${STARTUP_LOG} 2>&1 &
+    nohup ${JAVA_CMD} ${JAVA_OPTS} -jar ${APP_JAR} --spring.profiles.active=${SPRING_PROFILES} >> ${STARTUP_LOG} 2>&1 &
     local new_pid=$!
     echo "Java 进程已启动，PID: ${new_pid}"
 
-    # 等待几秒检查进程是否存活
     sleep 5
     if kill -0 ${new_pid} 2>/dev/null; then
         echo "应用启动成功，PID: ${new_pid}"
@@ -83,8 +88,8 @@ function start_app() {
     fi
 }
 
-# 6. 主流程
-echo "========== 开始重启 ${APP_NAME} =========="
+# 主流程
+echo "========== 开始重启 =========="
 stop_app
 sleep 2
 start_app
