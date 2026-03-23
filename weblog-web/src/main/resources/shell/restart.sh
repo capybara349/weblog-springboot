@@ -2,10 +2,14 @@
 # ====================================================================
 #  脚本名称: restart.sh
 #  功能描述: 重启 Spring Boot 应用（weblog-web）
-#  依赖: bash, java, ls, grep, kill, pgrep (或 ps)
 # ====================================================================
 
-set -e  # 遇到错误立即退出
+# 开启调试模式，打印每条命令
+set -ex
+# 合并标准错误到标准输出，确保所有输出都被 Jenkins 捕获
+exec 2>&1
+# 捕获错误行号
+trap 'echo "错误发生在行: $LINENO, 命令: $BASH_COMMAND"' ERR
 
 # 1. 定位 Java
 JAVA_CMD=$(command -v java 2>/dev/null || true)
@@ -19,7 +23,7 @@ echo "[INFO] 使用 Java: ${JAVA_CMD}"
 APP_DIR="/app/weblog"
 echo "[INFO] 应用目录: ${APP_DIR}"
 
-# 3. 查找最新的 jar 文件（动态匹配，不关心版本号细节）
+# 3. 查找最新的 jar 文件
 APP_JAR=$(ls -t ${APP_DIR}/weblog-web-*.jar 2>/dev/null | head -1)
 if [ -z "${APP_JAR}" ]; then
     echo "[ERROR] 在 ${APP_DIR} 下未找到任何 weblog-web-*.jar 文件！"
@@ -35,30 +39,32 @@ SPRING_PROFILES="prod"
 PID_FILE="${APP_DIR}/app.pid"
 STARTUP_LOG="${APP_DIR}/startup.log"
 
-# 5. 获取进程 PID（精确匹配该 jar 的 java 进程）
+# 5. 获取进程 PID
 function get_pid() {
-    # 优先使用 ps，避免 pgrep 在不同环境下行为差异
     ps -ef | grep "java.*weblog-web.*\.jar" | grep -v grep | awk '{print $2}' | head -1
 }
 
-# 6. 停止应用（优雅→强制）
+# 6. 停止应用
 function stop_app() {
+    echo "[DEBUG] 进入 stop_app 函数"
     local pid=$(get_pid)
+    echo "[DEBUG] 获取到的 PID: '${pid}'"
     if [ -z "${pid}" ]; then
         echo "[INFO] 应用未运行，无需停止。"
         return 0
     fi
 
     echo "[INFO] 检测到运行中的 PID: ${pid}，尝试停止..."
+    echo "[DEBUG] 执行命令: kill -15 ${pid}"
     kill -15 ${pid} 2>/dev/null || true
     echo "[INFO] 已发送 SIGTERM 信号，等待进程退出..."
 
     local timeout=30
     local count=0
     while [ $count -lt $timeout ]; do
-        # 每次检查前打印计数（便于调试）
         echo "[DEBUG] 检查进程是否还在，第 $((count+1)) 次..."
         local current_pid=$(get_pid)
+        echo "[DEBUG] 当前 PID: '${current_pid}'"
         if [ -z "${current_pid}" ]; then
             echo "[INFO] 应用已优雅停止。"
             return 0
@@ -78,18 +84,16 @@ function stop_app() {
     fi
 }
 
-# 7. 启动应用（后台运行，并验证）
+# 7. 启动应用
 function start_app() {
     echo "[INFO] 启动应用..."
     cd ${APP_DIR}
     > ${STARTUP_LOG}
 
-    # 后台启动，并将输出重定向到日志文件
     nohup ${JAVA_CMD} ${JAVA_OPTS} -jar ${APP_JAR} --spring.profiles.active=${SPRING_PROFILES} >> ${STARTUP_LOG} 2>&1 &
     local new_pid=$!
     echo "[INFO] Java 进程已启动，PID: ${new_pid}"
 
-    # 等待几秒，检查进程是否存活
     sleep 5
     if kill -0 ${new_pid} 2>/dev/null; then
         echo "[INFO] 应用启动成功，PID: ${new_pid}"
