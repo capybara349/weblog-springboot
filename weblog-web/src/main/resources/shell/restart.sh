@@ -4,11 +4,8 @@
 #  功能描述: 重启 Spring Boot 应用（weblog-web）
 # ====================================================================
 
-# 开启调试模式，打印每条命令
 set -ex
-# 合并标准错误到标准输出，确保所有输出都被 Jenkins 捕获
 exec 2>&1
-# 捕获错误行号
 trap 'echo "错误发生在行: $LINENO, 命令: $BASH_COMMAND"' ERR
 
 # 1. 定位 Java
@@ -70,7 +67,7 @@ function stop_app() {
             return 0
         fi
         sleep 1
-        ((count++))
+        count=$((count+1))
     done
 
     echo "[WARN] 优雅停止超时（${timeout}秒），强制终止进程 ${pid} ..."
