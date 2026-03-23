@@ -9,14 +9,18 @@ APP_NAME="weblog-web-0.0.1-SNAPSHOT.jar"
 APP_PATH="/app/weblog/${APP_NAME}"
 JAVA_OPTS="-Xms256m -Xmx256m"
 SPRING_PROFILES="prod"
-PID_FILE="/app/weblog/app.pid"   # 可选，记录 PID 便于管理
+PID_FILE="/app/weblog/app.pid"
+# 临时日志文件（用于捕获启动错误）
+STARTUP_LOG="/app/weblog/startup.log"
 
-# 检测应用是否正在运行
+# 检测应用是否正在运行（更精确的匹配，避免匹配到 grep 自身）
 function get_pid() {
-    ps -ef | grep "${APP_NAME}" | grep -v grep | awk '{print $2}'
+    pgrep -f "java.*${APP_NAME}" 2>/dev/null
+    # 或者使用 ps 并过滤
+    # ps -ef | grep "java.*${APP_NAME}" | grep -v grep | awk '{print $2}'
 }
 
-# 停止应用（优雅停止，超时强制 kill）
+# 停止应用
 function stop_app() {
     local pid=$(get_pid)
     if [ -z "${pid}" ]; then
@@ -48,15 +52,29 @@ function stop_app() {
     fi
 }
 
-# 启动应用
+# 启动应用（并验证启动是否成功）
 function start_app() {
     echo "启动应用..."
     cd /app/weblog
-    source /etc/profile   # 确保 java 命令可用
-    nohup java -jar ${APP_PATH} ${JAVA_OPTS} --spring.profiles.active=${SPRING_PROFILES} > /dev/null 2>&1 &
+    # 清空之前的启动日志
+    > ${STARTUP_LOG}
+    # 后台启动，并将输出重定向到文件（便于调试），同时保留控制台输出（便于 Jenkins 日志）
+    nohup java ${JAVA_OPTS} -jar ${APP_PATH} --spring.profiles.active=${SPRING_PROFILES} >> ${STARTUP_LOG} 2>&1 &
     local new_pid=$!
-    echo "应用已启动，PID: ${new_pid}"
-    echo ${new_pid} > ${PID_FILE}
+    echo "Java 进程已启动，PID: ${new_pid}"
+
+    # 等待 5 秒，检查进程是否还活着
+    sleep 5
+    if kill -0 ${new_pid} 2>/dev/null; then
+        echo "应用启动成功，PID: ${new_pid}"
+        echo ${new_pid} > ${PID_FILE}
+    else
+        echo "错误：应用启动后立即退出，请检查日志："
+        echo "========== 启动日志（${STARTUP_LOG}）=========="
+        cat ${STARTUP_LOG}
+        echo "============================================="
+        exit 1
+    fi
 }
 
 # 主流程
