@@ -37,12 +37,8 @@ STARTUP_LOG="${APP_DIR}/startup.log"
 
 # 5. 获取进程 PID（精确匹配该 jar 的 java 进程）
 function get_pid() {
-    # 使用 pgrep 更可靠，如果没有则用 ps
-    if command -v pgrep >/dev/null 2>&1; then
-        pgrep -f "java.*$(basename ${APP_JAR})" 2>/dev/null || true
-    else
-        ps -ef | grep "java.*$(basename ${APP_JAR})" | grep -v grep | awk '{print $2}' || true
-    fi
+    # 优先使用 ps，避免 pgrep 在不同环境下行为差异
+    ps -ef | grep "java.*weblog-web.*\.jar" | grep -v grep | awk '{print $2}' | head -1
 }
 
 # 6. 停止应用（优雅→强制）
@@ -55,11 +51,15 @@ function stop_app() {
 
     echo "[INFO] 检测到运行中的 PID: ${pid}，尝试停止..."
     kill -15 ${pid} 2>/dev/null || true
+    echo "[INFO] 已发送 SIGTERM 信号，等待进程退出..."
 
     local timeout=30
     local count=0
     while [ $count -lt $timeout ]; do
-        if [ -z "$(get_pid)" ]; then
+        # 每次检查前打印计数（便于调试）
+        echo "[DEBUG] 检查进程是否还在，第 $((count+1)) 次..."
+        local current_pid=$(get_pid)
+        if [ -z "${current_pid}" ]; then
             echo "[INFO] 应用已优雅停止。"
             return 0
         fi
@@ -67,7 +67,7 @@ function stop_app() {
         ((count++))
     done
 
-    echo "[WARN] 优雅停止超时，强制终止进程 ${pid} ..."
+    echo "[WARN] 优雅停止超时（${timeout}秒），强制终止进程 ${pid} ..."
     kill -9 ${pid} 2>/dev/null || true
     sleep 2
     if [ -z "$(get_pid)" ]; then

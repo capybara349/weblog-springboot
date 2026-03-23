@@ -13,9 +13,6 @@
     <name>weblog-web</name>
     <description>weblog-web (入口项目，负责博客前台展示相关功能，打包也放在这个模块负责)</description>
 
-    <properties>
-        <kotlin.version>2.2.20</kotlin.version>
-    </properties>
 
 
     <dependencies>
@@ -121,40 +118,29 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
+                        <id>copy-shell-script</id>
+                        <phase>process-resources</phase>
                         <goals>
-                            <goal>compile</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <sourceDirs>
-                                <sourceDir>src/main/java</sourceDir>
-                                <sourceDir>target/generated-sources/annotations</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>src/test/java</sourceDir>
-                                <sourceDir>target/generated-test-sources/test-annotations</sourceDir>
-                            </sourceDirs>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/shell</directory>
+                                    <includes>
+                                        <include>restart.sh</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <jvmTarget>1.8</jvmTarget>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
