@@ -13,7 +13,7 @@ spring:
   mail:
     host: smtp.qq.com # 邮件服务器的地址，这里使用的 QQ 邮件
     username: 1375283285@qq.com # 发送邮件的邮箱账号
-    password: xxx # 授权码，或发送邮件的邮箱账号的密码
+    password: cxodczhbuienjgge # 授权码，或发送邮件的邮箱账号的密码
     default-encoding: utf-8 # 邮件内容的字符编码
     protocol: smtps # 邮件传输协议：smtps 表示SMTP over SSL，是一种加密的SMTP连接方式，用于确保邮件传输的安全性。
     port: 465 # 邮件服务器的端口号：465 是 SMTPS（SMTP over SSL）的常用端口号，用于加密的邮件传输。
@@ -30,3 +30,15 @@ jwt:
 
 # 鬼鬼 API 密钥
 api-key: 1f8de01c3c196178f9d3769be770617d
+
+# 行为验证码
+captcha:
+  expire: # 验证码过期时间，默认是 2分钟,单位毫秒， 可以根据自身业务进行调整
+    default: 10000 # 默认缓存时间 2分钟
+    WORD_IMAGE_CLICK: 20000 # 针对 点选验证码 过期时间设置为 2分钟， 因为点选验证码验证比较慢，把过期时间调整大一些
+  secondary:
+    enabled: true # 二次验证， 默认 false 不开启
+  # 初始化默认模板资源（滑块形状等），非常重要！
+  init-default-resource: true
+  local-cache-enabled: true
+  local-cache-size: 20
