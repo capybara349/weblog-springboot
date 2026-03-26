@@ -30,7 +30,7 @@ spring:
 # minio (上传图片需要，需配置成自己的地址)
 #=================================================================
 minio:
-  endpoint: http://img.capybara349.com
+  endpoint: https://img.capybara349.com
   accessKey: capybara349
   secretKey: capybara349
   bucketName: weblog
@@ -43,4 +43,4 @@ lucene:
 # 博客域名地址
 #=================================================================
 domain:
-  url: http://www.capybara349.com/#
+  url: https://www.capybara349.com/#
